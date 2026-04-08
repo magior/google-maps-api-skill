@@ -1,0 +1,6 @@
+interface:
+  display_name: "Google Maps Platform"
+  short_description: "Query Google Maps Platform APIs from Codex"
+  default_prompt: "Use the bundled Google Maps Platform CLI first, surface API failures clearly, confirm before generating HTML, and ask when the user may prefer text, JSON, or HTML output."
+policy:
+  allow_implicit_invocation: true

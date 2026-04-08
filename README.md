@@ -1,118 +1,107 @@
-# Google Maps Platform API Skill for Claude Code
+# Google Maps Platform API Skill for Codex
 
-A complete CLI client for **20+ Google Maps Platform REST APIs** — built as a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code). No external dependencies; uses only Python standard library.
+This repository packages a Codex-first skill around a single stdlib-only CLI for **20+ Google Maps Platform APIs**.
 
-## APIs Covered
+Fork note: this project is a fork of [tivojn/google-maps-api-skill](https://github.com/tivojn/google-maps-api-skill).
 
-| Category | APIs |
-|----------|------|
-| **Core** | Geocoding, Reverse Geocoding, Directions, Distance Matrix |
-| **Places** | Text Search, Nearby Search, Place Details, Autocomplete, Photos |
-| **Environment** | Weather, Air Quality, Pollen, Solar |
-| **Maps** | Static Maps, Street View, Maps Embed (free), Maps JavaScript |
-| **Other** | Elevation, Time Zone, Address Validation, Roads, Geolocation, Aerial View, Route Optimization |
+## What it does
 
-## Quick Start
+The bundled CLI in [scripts/gmaps.py](scripts/gmaps.py) covers:
 
-### 1. Install the skill
+- Geocoding and reverse geocoding
+- Routes and distance matrices
+- Places search, nearby search, details, autocomplete, and photos
+- Weather, air quality, pollen, and solar
+- Elevation and time zone lookups
+- Address validation and roads APIs
+- Street View, static maps, geolocation, aerial view, and route optimization
+- Embeddable map URL generation
 
-```bash
-claude skill install tivojn/google-maps-api-skill
+## Codex skill layout
+
+This repository is already structured as a skill root:
+
+```text
+google-maps-api/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+├── references/
+│   ├── api-reference.md
+│   ├── html-output.md
+│   ├── security.md
+│   └── setup.md
+├── scripts/
+│   └── gmaps.py
+├── examples/
+│   └── trip-plan-example.html
+└── ...
 ```
 
-### 2. Add your API key
+## How to use it with Codex
+
+According to the Codex skills docs, repository-scoped skills live under `.agents/skills`, and user-wide skills live under `$HOME/.agents/skills`.
+
+To use this skill in Codex, place or symlink this directory at one of these paths:
+
+- `.agents/skills/google-maps-api`
+- `$HOME/.agents/skills/google-maps-api`
+
+Codex detects skills from the containing folder and reads [SKILL.md](SKILL.md) plus optional metadata from [agents/openai.yaml](agents/openai.yaml).
+
+## Setup
+
+Add your Google Maps API key:
+
+```bash
+echo 'GOOGLE_MAPS_API_KEY=your_key_here' >> .env
+```
+
+or:
 
 ```bash
 echo 'GOOGLE_MAPS_API_KEY=your_key_here' >> ~/.env
 ```
 
-Get a key from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+Get a key from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials), then enable the APIs you need in the [API Library](https://console.cloud.google.com/apis/library).
 
-### 3. Enable APIs
+More setup and troubleshooting guidance is in [references/setup.md](references/setup.md).
 
-Enable the APIs you need in [APIs & Services > Library](https://console.cloud.google.com/apis/library). If you forget, the skill will detect the error and offer to walk you through enabling it via Playwright.
-
-### 4. Use it
-
-Just ask Claude naturally:
-
-- *"What's the weather in Tokyo?"*
-- *"Find the best pizza near Times Square"*
-- *"How do I drive from LA to San Francisco?"*
-- *"What's the air quality in Delhi right now?"*
-- *"Is this address valid: 1600 Amphitheatre Pkwy, Mountain View?"*
-- *"Can I put solar panels on my roof at [address]?"*
-
-## Usage Examples
+## CLI usage examples
 
 ```bash
-# Geocode an address
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py geocode "1600 Amphitheatre Parkway, Mountain View, CA"
-
-# Get directions
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py directions "New York, NY" "Boston, MA" --mode transit
-
-# Search for places
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py places-search "best ramen in Tokyo"
-
-# Check weather
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py weather 40.7128 -74.0060
-
-# Air quality
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py air-quality 40.7128 -74.0060 --health --pollutants
-
-# Pollen forecast
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py pollen 34.0522 -118.2437 --days 5
-
-# Solar potential
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py solar 37.4219 -122.0841
-
-# Elevation
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py elevation 39.7392 -104.9903
-
-# Validate an address
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py validate-address "1600 Amphitheatre Pkwy, Mountain View, CA 94043"
-
-# Street View
-python3 ~/.claude/skills/google-maps-api/scripts/gmaps.py streetview --location "Eiffel Tower, Paris"
+python3 scripts/gmaps.py geocode "1600 Amphitheatre Parkway, Mountain View, CA"
+python3 scripts/gmaps.py directions "New York, NY" "Boston, MA" --mode transit
+python3 scripts/gmaps.py places-search "best ramen in Tokyo"
+python3 scripts/gmaps.py weather 40.7128 -74.0060
+python3 scripts/gmaps.py air-quality 40.7128 -74.0060 --health --pollutants
+python3 scripts/gmaps.py solar 37.4219 -122.0841
+python3 scripts/gmaps.py validate-address "1600 Amphitheatre Pkwy, Mountain View, CA 94043"
+python3 scripts/gmaps.py embed-url --mode place --query "Eiffel Tower"
 ```
 
-## Interactive HTML Output
+Run `python3 scripts/gmaps.py --help` to see the full command surface.
 
-When results benefit from a visual presentation, the skill can generate interactive HTML pages with maps, routes, dashboards, and Street View panoramas — using the **Warm Stone Sunrise** theme (light, warm-toned, premium design). It will always ask before generating HTML.
+## HTML output
 
-See `examples/trip-plan-example.html` for a sample.
+The skill can support browser-friendly outputs such as maps, route pages, and dashboards, but it should ask before generating HTML. For shareable outputs, prefer zero-key embeds and direct Google Maps links.
 
-## Key Features
+See:
 
-- **Zero dependencies** — Python stdlib only (`urllib`, `json`, `ssl`)
-- **20+ APIs** from a single `gmaps.py` script
-- **Guided API enablement** — if an API isn't enabled, the skill offers to walk you through enabling it in your browser via Playwright
-- **Interactive HTML pages** — maps, routes, weather dashboards, and more
-- **API key security** — `.env` is gitignored; production architecture docs for multi-user deployments
+- [references/html-output.md](references/html-output.md)
+- [examples/trip-plan-example.html](examples/trip-plan-example.html)
 
-## Project Structure
+## Security model
 
-```
-├── SKILL.md           # Full skill definition (API reference, themes, security docs)
-├── scripts/
-│   └── gmaps.py       # Main CLI script — all 20+ API commands
-├── examples/
-│   └── trip-plan-example.html
-├── .env.example       # API key template
-├── .env               # Your actual key (gitignored)
-└── README.md
-```
+This repository is primarily designed for local Codex use with a user-owned Google Maps API key. For hosted or multi-user deployments, treat key exposure as a security concern and move data API access server-side.
 
-## API Key Security
+See [references/security.md](references/security.md) for the detailed notes.
 
-- `.env` is in `.gitignore` — your key stays local
-- For personal use, the key is embedded in generated HTML pages (your machine only)
-- For production/multi-user apps, see the **API Key Security & Production Architecture** section in `SKILL.md` for a two-key backend proxy setup
+## Why this repo stays lightweight
 
-## Pricing
-
-Most APIs charge per request, but Google provides a **$200/month free credit**. The Maps Embed API is always free. See [Google Maps pricing](https://developers.google.com/maps/billing-and-pricing/pricing) for details.
+- No third-party Python dependencies
+- A single CLI entrypoint for all supported APIs
+- Skill instructions kept concise, with long-form material moved to `references/`
 
 ## License
 
