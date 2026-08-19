@@ -450,15 +450,15 @@ def cmd_weather(args):
     if args.mode == "current":
         url = f"{base}/currentConditions:lookup"
     elif args.mode == "hourly":
-        url = f"{base}/forecast/hours"
+        url = f"{base}/forecast/hours:lookup"
         if args.hours:
-            params["forecastHours"] = args.hours
+            params["hours"] = args.hours
     elif args.mode == "daily":
-        url = f"{base}/forecast/days"
+        url = f"{base}/forecast/days:lookup"
         if args.days:
-            params["forecastDays"] = args.days
+            params["days"] = args.days
     elif args.mode == "history":
-        url = f"{base}/history/hours"
+        url = f"{base}/history/hours:lookup"
         if args.hours:
             params["hours"] = args.hours
     else:
